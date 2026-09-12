@@ -1,11 +1,11 @@
 services:
-  # 1. The Express Backend API
+  # 1. The Express Backend API + Background Worker (Combined for Free Tier)
   - type: web
     name: jobflow-api
     env: node
     plan: free
     buildCommand: npm install && npx prisma generate --schema=packages/db/prisma/schema.prisma
-    startCommand: npm run dev:api
+    startCommand: npm run dev:worker & npm run dev:api
     envVars:
       - key: DATABASE_URL
         sync: false
@@ -25,14 +25,3 @@ services:
           type: web
           name: jobflow-api
           envVarKey: RENDER_EXTERNAL_URL
-
-  # 3. The Background Job Worker
-  - type: worker
-    name: jobflow-worker
-    env: node
-    plan: free
-    buildCommand: npm install && npx prisma generate --schema=packages/db/prisma/schema.prisma
-    startCommand: npm run dev:worker
-    envVars:
-      - key: DATABASE_URL
-        sync: false
