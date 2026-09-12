@@ -6,8 +6,6 @@ import {
   Calendar,
   List,
   FileText,
-  Server,
-  Settings,
   Zap
 } from "lucide-react";
 
