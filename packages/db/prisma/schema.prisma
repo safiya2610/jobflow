@@ -1,0 +1,98 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  jobs Job[]
+
+  @@map("users")
+}
+
+model Job {
+  id             String    @id @default(uuid())
+  userId         String    @map("user_id")
+  name           String
+  description    String?
+  type           String    @default("HTTP_REQUEST") // currently only HTTP_REQUEST
+  endpoint       String
+  method         String    @default("GET")
+  headers        Json?
+  payload        String?   @db.Text
+  cronSchedule   String?   @map("cron_schedule")
+  status         String    @default("ACTIVE") // ACTIVE, PAUSED
+  retryLimit     Int       @default(0) @map("retry_limit")
+  timeoutSeconds Int       @default(30) @map("timeout_seconds")
+  nextRunAt      DateTime? @map("next_run_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  executions Execution[]
+
+  @@index([userId])
+  @@map("jobs")
+}
+
+model Execution {
+  id             String    @id @default(uuid())
+  jobId          String    @map("job_id")
+  status         String    @default("PENDING") // PENDING, RUNNING, RETRYING, SUCCESS, FAILED
+  attemptNumber  Int       @default(1) @map("attempt_number")
+  workerId       String?   @map("worker_id")
+  lockedAt       DateTime? @map("locked_at")
+  heartbeatAt    DateTime? @map("heartbeat_at")
+  queuedAt       DateTime  @default(now()) @map("queued_at")
+  startedAt      DateTime? @map("started_at")
+  completedAt    DateTime? @map("completed_at")
+  httpStatus     Int?      @map("http_status")
+  responseData   String?   @db.Text @map("response_data")
+  errorDetails   String?   @db.Text @map("error_details")
+  idempotencyKey String?   @map("idempotency_key")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, idempotencyKey])
+  @@index([jobId])
+  @@index([status, queuedAt])
+  @@index([status, heartbeatAt])
+  @@map("executions")
+}
+
+model Worker {
+  id              String    @id @default(uuid())
+  workerName      String    @unique @map("worker_name")
+  status          String    @default("ONLINE") // ONLINE, OFFLINE
+  lastHeartbeatAt DateTime? @map("last_heartbeat_at")
+  startedAt       DateTime  @default(now()) @map("started_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  @@index([lastHeartbeatAt])
+  @@map("workers")
+}
+
+model SystemLog {
+  id        String   @id @default(uuid())
+  level     String   // INFO, WARN, ERROR, DEBUG
+  service   String   // worker, scheduler, queue
+  workerId  String?  @map("worker_id")
+  event     String
+  message   String   @db.Text
+  context   String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("system_logs")
+}

@@ -1,0 +1,38 @@
+services:
+  # 1. The Express Backend API
+  - type: web
+    name: jobflow-api
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm run dev:api
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+
+  # 2. The Next.js Frontend Web App
+  - type: web
+    name: jobflow-web
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build:web
+    startCommand: npm run dev:web
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: jobflow-api
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # 3. The Background Job Worker
+  - type: worker
+    name: jobflow-worker
+    env: node
+    plan: free
+    buildCommand: npm install && npx prisma generate
+    startCommand: npm run dev:worker
+    envVars:
+      - key: DATABASE_URL
+        sync: false

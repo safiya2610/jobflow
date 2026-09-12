@@ -1,0 +1,20 @@
+{
+  "name": "worker",
+  "version": "1.0.0",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "axios": "^1.6.7",
+    "cron-parser": "^5.10.0",
+    "db": "*",
+    "dotenv": "^16.4.5",
+    "types": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.1",
+    "typescript": "^5.2.2"
+  }
+}
