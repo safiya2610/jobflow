@@ -18,7 +18,7 @@ services:
     env: node
     plan: free
     buildCommand: npm install && npm run build:web
-    startCommand: npm run dev:web
+    startCommand: npm run start:web
     envVars:
       - key: NEXT_PUBLIC_API_URL
         fromService:

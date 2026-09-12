@@ -11,6 +11,7 @@
     "dev:web": "npm run dev --workspace=web",
     "dev:api": "npm run dev --workspace=api",
     "dev:worker": "npm run dev --workspace=worker",
+    "start:web": "npm run start --workspace=web",
     "build:web": "npm run build --workspace=web",
     "build:api": "npm run build --workspace=api",
     "build:worker": "npm run build --workspace=worker",
