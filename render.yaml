@@ -4,7 +4,7 @@ services:
     name: jobflow-api
     env: node
     plan: free
-    buildCommand: npm install && npx prisma generate
+    buildCommand: npm install && npx prisma generate --schema=packages/db/prisma/schema.prisma
     startCommand: npm run dev:api
     envVars:
       - key: DATABASE_URL
@@ -31,7 +31,7 @@ services:
     name: jobflow-worker
     env: node
     plan: free
-    buildCommand: npm install && npx prisma generate
+    buildCommand: npm install && npx prisma generate --schema=packages/db/prisma/schema.prisma
     startCommand: npm run dev:worker
     envVars:
       - key: DATABASE_URL
